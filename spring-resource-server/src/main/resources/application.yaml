@@ -1,0 +1,13 @@
+server:
+  port: 8082    # <1>
+
+spring.application.name: resource-server
+
+spring.threads.virtual.enabled: true
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${NSA2_JWT_ISSUER_URI:http://localhost:9000/realms/nsa2-realm} # <2>

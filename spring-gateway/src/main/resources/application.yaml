@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: spring-gateway
+  threads:
+    virtual:
+      enabled: true # <1>
+  security:
+    oauth2:
+      client:
+        registration:
+          nsa2-gateway:
+            provider: keycloak
+            client-id: nsa2-gateway
+            client-secret: SBj7vuReMnPISJPIR3KPUuEc7Czrprjh # <3>
+            authorization-grant-type: authorization_code
+            scope: openid,profile,email
+            redirect-uri: "{baseUrl}/login/oauth2/code/nsa2-gateway"
+            client-name: "NSA2 Keycloak"
+            client-authentication-method: client_secret_basic
+        provider:
+          keycloak:
+            issuer-uri: ${NSA2_OAUTH_ISSUER_URI:http://localhost:9000/realms/nsa2-realm} # <4>
+            user-name-attribute: preferred_username
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+
+server:
+  main.banner-mode: off
+  tomcat.threads.max: 10
+  servlet:
+    context-path: /
+    session:
+      cookie:
+        http-only: true
