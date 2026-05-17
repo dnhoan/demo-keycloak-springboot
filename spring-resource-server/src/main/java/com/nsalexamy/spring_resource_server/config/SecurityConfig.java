@@ -1,5 +1,7 @@
 package com.nsalexamy.spring_resource_server.config;
 
+import com.nsalexamy.spring_resource_server.exception.RestSecurityExceptionHandlers;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -13,8 +15,15 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity(prePostEnabled = true) // <1>
 public class SecurityConfig {
 
-    // <2>
-    private final String jwkSetUri = "http://localhost:9000/realms/nsa2-realm/protocol/openid-connect/certs";
+    private final String jwkSetUri;
+    private final RestSecurityExceptionHandlers securityExceptionHandlers;
+
+    public SecurityConfig(
+            @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}") String jwkSetUri,
+            RestSecurityExceptionHandlers securityExceptionHandlers) {
+        this.jwkSetUri = jwkSetUri;
+        this.securityExceptionHandlers = securityExceptionHandlers;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(
@@ -22,6 +31,10 @@ public class SecurityConfig {
             JwtAuthenticationConverter nsa2AuthenticationConverter) throws Exception {
 
         http
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(securityExceptionHandlers)
+                        .accessDeniedHandler(securityExceptionHandlers)
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/**").permitAll()
                         .anyRequest().authenticated()

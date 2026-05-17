@@ -11,3 +11,4 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${NSA2_JWT_ISSUER_URI:http://localhost:9000/realms/nsa2-realm} # <2>
+          jwk-set-uri: ${NSA2_JWT_JWK_SET_URI:http://localhost:9000/realms/nsa2-realm/protocol/openid-connect/certs}

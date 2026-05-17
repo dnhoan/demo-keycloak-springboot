@@ -38,15 +38,22 @@ public class CustomJwtGrantedAuthoritiesConverter implements Converter<Jwt, Coll
 
         Map<String, Object> resourceAccess = source.getClaimAsMap(RESOURCE_ACCESS);
 
-        // <1>
         if (resourceAccess != null && resourceAccess.containsKey(CLIENT_ID)) {
-            Map<String, Object> clientAccess = (Map<String, Object>) resourceAccess.get(CLIENT_ID);
-            if (clientAccess.containsKey(ROLES)) {
-                List<String> clientRoles = (List<String>) clientAccess.get(ROLES);
-                authorities = Stream.concat(
-                        authorities.stream(),
-                        clientRoles.stream().map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role).map(SimpleGrantedAuthority::new)
-                ).collect(Collectors.toList());
+            Object clientAccessValue = resourceAccess.get(CLIENT_ID);
+            if (clientAccessValue instanceof Map<?, ?> clientAccess) {
+                Object rolesValue = clientAccess.get(ROLES);
+                if (rolesValue instanceof List<?> rolesList) {
+                    List<String> clientRoles = rolesList.stream()
+                            .filter(String.class::isInstance)
+                            .map(String.class::cast)
+                            .toList();
+                    authorities = Stream.concat(
+                            authorities.stream(),
+                            clientRoles.stream()
+                                    .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role)
+                                    .map(SimpleGrantedAuthority::new)
+                    ).collect(Collectors.toList());
+                }
             }
         }
 

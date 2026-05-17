@@ -17,7 +17,7 @@ import java.util.Map;
 @RequestMapping("/secure")
 public class SecureController {
 
-    @PreAuthorize("hasAnyRole('NSA2_USER', 'NSA2_ADMIN')")  // <1>
+    @PreAuthorize("hasAnyRole('NSA2_USER', 'NSA2_ADMIN')") // <1>
     @GetMapping("/hello")
     public Message hello(Principal principal, JwtAuthenticationToken jwtToken) {
         log.info("principal: {}", principal);
@@ -28,7 +28,7 @@ public class SecureController {
         return new Message("ResourceServer - Hello, " + principal.getName());
     }
 
-    @PreAuthorize("hasRole('NSA2_ADMIN')")  // <2>
+    @PreAuthorize("hasRole('NSA2_ADMIN')") // <2>
     @GetMapping("/admin/hello")
     public Message adminHello(Principal principal) {
         return new Message("ResourceServer - Admin Hello, " + principal.getName());
@@ -40,7 +40,7 @@ public class SecureController {
         Map<String, Object> tokenAttributes = jwtToken.getTokenAttributes();
         log.info("principal class: {}", jwtToken.getPrincipal().getClass());
 
-        if(jwtToken.getPrincipal() instanceof DefaultOidcUser oidcUser) {
+        if (jwtToken.getPrincipal() instanceof DefaultOidcUser oidcUser) {
             log.info("oidcUser: {}", oidcUser);
         } else {
             log.info("is not instance of DefaultOidcUser");
