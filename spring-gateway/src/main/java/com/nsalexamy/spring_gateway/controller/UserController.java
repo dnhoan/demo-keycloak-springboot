@@ -1,14 +1,15 @@
 package com.nsalexamy.spring_gateway.controller;
 
+import com.nsalexamy.spring_gateway.annotation.Idempotent;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -21,6 +22,20 @@ public class UserController {
         String username = authentication.getName();
         log.info("username: {}",username);
         return Map.of("username", username);
+    }
+
+    // <3>
+    @Idempotent
+    @PostMapping("/create")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Map<String, Object> createUser(@RequestBody Map<String, Object> payload) {
+        log.info("Creating user with payload: {}", payload);
+        String generatedId = UUID.randomUUID().toString();
+        return Map.of(
+                "id", generatedId,
+                "status", "CREATED",
+                "data", payload
+        );
     }
 
     // <2>
