@@ -1,6 +1,7 @@
 package com.nsalexamy.spring_gateway.aspect;
 
 import com.nsalexamy.spring_gateway.annotation.Idempotent;
+import com.nsalexamy.spring_gateway.dto.response.IdempotencyErrorResponse;
 import com.nsalexamy.spring_gateway.model.IdempotentResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -50,9 +51,9 @@ public class IdempotencyAspect {
             if (response != null) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
             }
-            return Map.of(
-                    "error", "Missing idempotency key",
-                    "header", idempotent.headerName()
+            return new IdempotencyErrorResponse(
+                    "Missing idempotency key",
+                    idempotent.headerName()
             );
         }
 
